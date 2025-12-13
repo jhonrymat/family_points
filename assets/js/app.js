@@ -121,7 +121,19 @@ async function loadData() {
 // Cargar tareas
 async function loadTasks() {
     try {
-        const response = await fetch('api/tareas.php?action=list');
+        const response = await fetch('api/tareas.php?action=list', {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            console.error('Error loading tasks, status:', response.status);
+            if (response.status === 401) {
+                window.location.href = 'login.php';
+                return;
+            }
+            throw new Error('Error al cargar tareas');
+        }
+        
         const data = await response.json();
         tasks = data.tareas;
         renderTasks();
@@ -198,7 +210,18 @@ async function claimTask(taskId) {
 // Cargar premios
 async function loadRewards() {
     try {
-        const response = await fetch('api/premios.php?action=list');
+        const response = await fetch('api/premios.php?action=list', {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = 'login.php';
+                return;
+            }
+            throw new Error('Error al cargar premios');
+        }
+        
         const data = await response.json();
         rewards = data.premios;
         renderRewards();
