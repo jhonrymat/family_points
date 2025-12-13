@@ -11,13 +11,13 @@ if (!defined('INCLUDED')) {
 // Configuración de la base de datos
 // CAMBIAR ESTOS VALORES CON TUS CREDENCIALES DE HOSTINGER
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'family_points');
-define('DB_USER', 'tu_usuario');  // Cambiar
-define('DB_PASS', 'tu_password'); // Cambiar
+define('DB_NAME', 'u736188689_puntos_db');
+define('DB_USER', 'u736188689_puntos_us');  // Cambiar
+define('DB_PASS', 'CzMsd:Yhr9!J'); // Cambiar
 define('DB_CHARSET', 'utf8mb4');
 
 // Configuración general
-define('SITE_URL', 'https://tudominio.com/family-points'); // Cambiar
+define('SITE_URL', 'https://puntos.agentesias.com');
 define('SESSION_LIFETIME', 7200); // 2 horas en segundos
 define('TIMEZONE', 'America/Bogota');
 
@@ -87,12 +87,18 @@ function sanitizeInput($data) {
 }
 
 function validateToken() {
+    error_log("validateToken called");
+    error_log("Cookies received: " . json_encode($_COOKIE));
+    
     if (!isset($_COOKIE['auth_token'])) {
+        error_log("No auth_token cookie found");
         return false;
     }
     
     $db = Database::getInstance()->getConnection();
     $token = $_COOKIE['auth_token'];
+    
+    error_log("Validating token: " . substr($token, 0, 10) . "...");
     
     $stmt = $db->prepare("
         SELECT s.*, u.id as user_id, u.nombre, u.rol, u.puntos 
@@ -104,8 +110,11 @@ function validateToken() {
     $session = $stmt->fetch();
     
     if (!$session) {
+        error_log("Session not found or expired for token");
         return false;
     }
+    
+    error_log("Session valid for user: " . $session['nombre']);
     
     return [
         'id' => $session['user_id'],
@@ -189,6 +198,11 @@ function limpiarSesionesExpiradas() {
     $stmt = $db->prepare("DELETE FROM sesiones WHERE expira_at < NOW()");
     return $stmt->execute();
 }
+
+// Configuración de sesión segura
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Lax');
 
 // Headers de seguridad
 header('X-Content-Type-Options: nosniff');

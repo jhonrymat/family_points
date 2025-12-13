@@ -79,13 +79,18 @@ if ($method === 'POST' && $action === 'login') {
     $stmt->execute([$usuario['id'], $token, $ip, $userAgent, $expira]);
     
     // Establecer cookie
-    setcookie('auth_token', $token, [
+    $cookieOptions = [
         'expires' => time() + SESSION_LIFETIME,
         'path' => '/',
-        'secure' => true,
+        'domain' => '', // Dejar vacío para que funcione en el dominio actual
+        'secure' => true, // HTTPS
         'httponly' => true,
-        'samesite' => 'Strict'
-    ]);
+        'samesite' => 'Lax' // Cambiar de Strict a Lax para mejor compatibilidad
+    ];
+    
+    setcookie('auth_token', $token, $cookieOptions);
+    
+    error_log("Cookie set for token: " . substr($token, 0, 10) . "...");
     
     jsonResponse([
         'success' => true,

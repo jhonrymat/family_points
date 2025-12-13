@@ -3,9 +3,9 @@
 # Habilitar motor de reescritura
 RewriteEngine On
 
-# Forzar HTTPS (descomentar cuando tengas SSL)
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Forzar HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Prevenir acceso a archivos sensibles
 <FilesMatch "^\.">
@@ -14,10 +14,10 @@ RewriteEngine On
 </FilesMatch>
 
 # Proteger archivos de configuración
-<Files "config.php">
+<FilesMatch "config\.php$">
     Order allow,deny
     Deny from all
-</Files>
+</FilesMatch>
 
 # Prevenir listado de directorios
 Options -Indexes
@@ -39,12 +39,13 @@ Options -Indexes
     Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
 </IfModule>
 
-# Prevenir acceso directo a archivos PHP en api/
-<IfModule mod_rewrite.c>
-    RewriteCond %{REQUEST_URI} ^/api/
-    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?tudominio\.com [NC]
-    RewriteRule .* - [F,L]
-</IfModule>
+# Protección básica para api/ (comentado temporalmente para debugging)
+# Si quieres activar protección por referer, descomenta estas líneas:
+# <IfModule mod_rewrite.c>
+#     RewriteCond %{REQUEST_URI} ^/api/
+#     RewriteCond %{HTTP_REFERER} !^https?://(www\.)?puntos\.agentesias\.com [NC]
+#     RewriteRule .* - [F,L]
+# </IfModule>
 
 # Configuración de PHP
 <IfModule mod_php7.c>

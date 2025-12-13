@@ -88,6 +88,7 @@
             try {
                 const response = await fetch('api/auth.php?action=login', {
                     method: 'POST',
+                    credentials: 'include', // Importante: incluir cookies
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -95,13 +96,19 @@
                 });
 
                 const data = await response.json();
+                console.log('Login response:', data);
 
                 if (response.ok && data.success) {
-                    window.location.href = 'index.php';
+                    console.log('Login successful, redirecting...');
+                    // Pequeño delay para asegurar que la cookie se guarde
+                    setTimeout(() => {
+                        window.location.href = 'index.php';
+                    }, 100);
                 } else {
                     showError(data.error || 'Error al iniciar sesión');
                 }
             } catch (error) {
+                console.error('Login error:', error);
                 showError('Error de conexión. Intenta nuevamente.');
             } finally {
                 loginBtn.disabled = false;
@@ -121,7 +128,9 @@
         // Verificar si ya está autenticado
         (async () => {
             try {
-                const response = await fetch('api/auth.php?action=check');
+                const response = await fetch('api/auth.php?action=check', {
+                    credentials: 'include'
+                });
                 if (response.ok) {
                     const data = await response.json();
                     if (data.authenticated) {
@@ -130,6 +139,7 @@
                 }
             } catch (error) {
                 // No hacer nada, el usuario no está autenticado
+                console.log('User not authenticated');
             }
         })();
     </script>

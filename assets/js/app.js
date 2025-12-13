@@ -19,15 +19,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Verificar autenticación
 async function checkAuth() {
     try {
-        const response = await fetch('api/auth.php?action=check');
+        console.log('Checking authentication...');
+        const response = await fetch('api/auth.php?action=check', {
+            method: 'GET',
+            credentials: 'include', // Importante: incluir cookies
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
+        
+        console.log('Auth check response status:', response.status);
+        
         const data = await response.json();
+        console.log('Auth check data:', data);
         
         if (!data.authenticated) {
+            console.log('Not authenticated, redirecting to login');
             window.location.href = 'login.php';
             return;
         }
         
         currentUser = data.usuario;
+        console.log('User authenticated:', currentUser);
         updateUserUI();
     } catch (error) {
         console.error('Error verificando autenticación:', error);
