@@ -10,11 +10,23 @@ $action = $_GET['action'] ?? '';
 
 // Login
 if ($method === 'POST' && $action === 'login') {
-    $data = json_decode(file_get_contents('php://input'), true);
+    $rawInput = file_get_contents('php://input');
+    error_log("Login attempt - Raw input: " . $rawInput);
+    
+    $data = json_decode($rawInput, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("JSON decode error: " . json_last_error_msg());
+        jsonResponse(['error' => 'Datos JSON inválidos'], 400);
+    }
+    
     $nombre = sanitizeInput($data['nombre'] ?? '');
     $password = $data['password'] ?? '';
     
+    error_log("Login attempt for user: $nombre");
+    
     if (empty($nombre) || empty($password)) {
+        error_log("Empty credentials provided");
         jsonResponse(['error' => 'Nombre y contraseña son requeridos'], 400);
     }
     
@@ -39,7 +51,19 @@ if ($method === 'POST' && $action === 'login') {
     $stmt->execute([$nombre]);
     $usuario = $stmt->fetch();
     
-    if (!$usuario || !password_verify($password, $usuario['password'])) {
+    error_log("User found: " . ($usuario ? "Yes" : "No"));
+    
+    if (!$usuario) {
+        error_log("User not found or inactive: $nombre");
+        jsonResponse(['error' => 'Credenciales inválidas'], 401);
+    }
+    
+    error_log("Verifying password...");
+    $passwordValid = password_verify($password, $usuario['password']);
+    error_log("Password valid: " . ($passwordValid ? "Yes" : "No"));
+    
+    if (!$passwordValid) {
+        error_log("Invalid password for user: $nombre");
         jsonResponse(['error' => 'Credenciales inválidas'], 401);
     }
     
