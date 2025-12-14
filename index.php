@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4285f4">
+    <!-- favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Puntos">
+    <link rel="apple-touch-icon" href="/assets/img/web-app-manifest-192x192.png">
+
     <title>Dashboard - Sistema de Puntos Familiar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -165,5 +175,59 @@
     <div id="modalContainer"></div>
 
     <script src="assets/js/app.js"></script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('Service Worker registrado'))
+            .catch((err) => console.log('Error:', err));
+    }
+
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevenir el prompt automático
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Mostrar tu botón/mensaje personalizado
+    mostrarBotonInstalar();
+    });
+
+    function mostrarBotonInstalar() {
+    // Crear botón o banner personalizado
+    const banner = document.createElement('div');
+    banner.innerHTML = `
+        <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+                    background: #4285f4; color: white; padding: 15px 25px; 
+                    border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                    z-index: 1000; text-align: center;">
+        <p style="margin: 0 0 10px 0;">¿Instalar Puntos en tu dispositivo?</p>
+        <button id="instalar" style="background: white; color: #4285f4; 
+                                        border: none; padding: 8px 20px; 
+                                        border-radius: 5px; cursor: pointer;">
+            Instalar
+        </button>
+        <button id="cancelar" style="background: transparent; color: white; 
+                                        border: 1px solid white; padding: 8px 20px; 
+                                        border-radius: 5px; margin-left: 10px; cursor: pointer;">
+            Ahora no
+        </button>
+        </div>
+    `;
+    document.body.appendChild(banner);
+    
+    document.getElementById('instalar').addEventListener('click', async () => {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`Usuario ${outcome === 'accepted' ? 'aceptó' : 'rechazó'} la instalación`);
+        banner.remove();
+        deferredPrompt = null;
+    });
+    
+    document.getElementById('cancelar').addEventListener('click', () => {
+        banner.remove();
+    });
+    }
+    </script>
 </body>
 </html>
