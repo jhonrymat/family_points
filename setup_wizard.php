@@ -4,6 +4,11 @@ $message = '';
 $error = '';
 $step = 1;
 
+// Seguridad: Bloquear si ya está instalado
+if (file_exists(__DIR__ . '/api/config.local.php')) {
+    die("El sistema ya está configurado. Por seguridad, elimina este archivo o 'api/config.local.php' para reconfigurar.");
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     
