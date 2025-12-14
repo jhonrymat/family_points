@@ -191,7 +191,7 @@ function renderTasks() {
 
 // Reclamar tarea
 async function claimTask(taskId) {
-    const task = tasks.find(t => t.id === taskId);
+    const task = tasks.find(t => t.id == taskId);
     if (!task) {
         console.error('Task not found:', taskId);
         return;
@@ -302,7 +302,7 @@ function renderRewards() {
 
 // Canjear premio
 async function redeemReward(rewardId) {
-    const reward = rewards.find(r => r.id === rewardId);
+    const reward = rewards.find(r => r.id == rewardId);
     if (!reward) return;
     
     const confirm = await showConfirm(
@@ -666,7 +666,7 @@ async function showConfirm(title, message = '') {
 
 // Modal functions
 function openTaskModal(taskId = null) {
-    const task = taskId ? tasks.find(t => t.id === taskId) : null;
+    const task = taskId ? tasks.find(t => t.id == taskId) : null;
     const isEdit = !!task;
     
     const modal = document.createElement('div');
@@ -807,7 +807,7 @@ function selectColor(color) {
 }
 
 function openRewardModal(rewardId = null) {
-    const reward = rewardId ? rewards.find(r => r.id === rewardId) : null;
+    const reward = rewardId ? rewards.find(r => r.id == rewardId) : null;
     const isEdit = !!reward;
     
     const modal = document.createElement('div');
