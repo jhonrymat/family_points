@@ -9,12 +9,16 @@ if (!defined('INCLUDED')) {
 }
 
 // Configuración de la base de datos
-// CAMBIAR ESTOS VALORES CON TUS CREDENCIALES DE HOSTINGER
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'family_points');
-define('DB_USER', 'tu_usuario');  // Cambiar
-define('DB_PASS', 'tu_password'); // Cambiar
-define('DB_CHARSET', 'utf8mb4');
+if (file_exists(__DIR__ . '/config.local.php')) {
+    require_once __DIR__ . '/config.local.php';
+} else {
+    // CAMBIAR ESTOS VALORES CON TUS CREDENCIALES DE HOSTINGER
+    define('DB_HOST', 'localhost');
+    define('DB_NAME', 'family_points');
+    define('DB_USER', 'tu_usuario');  // Cambiar
+    define('DB_PASS', 'tu_password'); // Cambiar
+    define('DB_CHARSET', 'utf8mb4');
+}
 
 // Configuración general
 define('SITE_URL', 'https://puntos.agentesias.com');
@@ -200,8 +204,10 @@ function limpiarSesionesExpiradas() {
 }
 
 // Configuración de sesión segura
+// Configuración de sesión segura
 ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
+$isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+ini_set('session.cookie_secure', $isSecure ? 1 : 0);
 ini_set('session.cookie_samesite', 'Lax');
 
 // Headers de seguridad

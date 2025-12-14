@@ -89,7 +89,7 @@ if ($method === 'POST' && $action === 'login') {
         'expires' => time() + SESSION_LIFETIME,
         'path' => '/',
         'domain' => '', // Dejar vacío para que funcione en el dominio actual
-        'secure' => true, // HTTPS
+        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on', // HTTPS solo si está activo
         'httponly' => true,
         'samesite' => 'Lax' // Cambiar de Strict a Lax para mejor compatibilidad
     ];
