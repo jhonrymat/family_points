@@ -11,9 +11,9 @@ if (!defined('INCLUDED')) {
 // Configuración de la base de datos
 // CAMBIAR ESTOS VALORES CON TUS CREDENCIALES DE HOSTINGER
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'u736188689_puntos_db');
-define('DB_USER', 'u736188689_puntos_us');  // Cambiar
-define('DB_PASS', 'CzMsd:Yhr9!J'); // Cambiar
+define('DB_NAME', 'family_points');
+define('DB_USER', 'tu_usuario');  // Cambiar
+define('DB_PASS', 'tu_password'); // Cambiar
 define('DB_CHARSET', 'utf8mb4');
 
 // Configuración general

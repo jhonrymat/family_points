@@ -10,6 +10,9 @@ $action = $_GET['action'] ?? '';
 
 // Login
 if ($method === 'POST' && $action === 'login') {
+    // Limpiar sesiones expiradas primero
+    limpiarSesionesExpiradas();
+    
     $rawInput = file_get_contents('php://input');
     error_log("Login attempt - Raw input: " . $rawInput);
     
@@ -69,14 +72,17 @@ if ($method === 'POST' && $action === 'login') {
     
     // Generar token de sesión
     $token = bin2hex(random_bytes(32));
-    $expira = date('Y-m-d H:i:s', time() + SESSION_LIFETIME);
+    
+    // Calcular expiración correctamente usando INTERVAL de MySQL
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     
     $stmt = $db->prepare("
         INSERT INTO sesiones (usuario_id, token, ip, user_agent, expira_at)
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? SECOND))
     ");
-    $stmt->execute([$usuario['id'], $token, $ip, $userAgent, $expira]);
+    $stmt->execute([$usuario['id'], $token, $ip, $userAgent, SESSION_LIFETIME]);
+    
+    error_log("Session created with token: " . substr($token, 0, 10) . "... expires in " . SESSION_LIFETIME . " seconds");
     
     // Establecer cookie
     $cookieOptions = [
